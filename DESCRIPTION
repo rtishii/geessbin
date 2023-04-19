@@ -1,15 +1,18 @@
 Package: geessbin
 Type: Package
 Title: Modified Generalized Estimating Equations for Binary Outcome
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(person("Ryota", "Ishii", email = "r.ishii0808@gmail.com",
                   role = c("aut", "cre")),
                  person("Tomohiro", "Ohigashi", role = "ctb"),
                  person("Kazushi", "Maruo", role = "ctb"),
                  person("Masahiko", "Gosho", role = "ctb"))
 Maintainer: Ryota Ishii <r.ishii0808@gmail.com>
-Description: Modified generalized estimating equations with bias-adjusted
-    covariance estimator for small-sample data with binary outcome.
+Description: Analyze small-sample clustered or longitudinal data with binary 
+    outcome using modified generalized estimating equations with bias-adjusted
+    covariance estimator. The package provides any combination of three 
+    modified generalized estimating equations and 11 bias-adjusted covariance 
+    estimators.
 Depends: R (>= 3.5.0)
 Imports: MASS (>= 7.3-45)
 License: GPL (>= 2)

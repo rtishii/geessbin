@@ -1,14 +1,50 @@
 #' Modified Generalized Estimating Equations for Binary Outcome
 #'
-#' \code{geessbin} provides results of modified generalized estimating equations
-#' with bias-adjusted covariance estimators for longitudinal or clustered
-#' data with binary outcomes
+#' \code{geessbin} analyzes small-sample clustered or longitudinal data using
+#' modified generalized estimating equations (GEE) with bias-adjusted covariance
+#' estimator. This function assumes binary outcome and uses the logit link
+#' function. This function provides any combination of three GEE methods
+#' (conventional and two modified GEE methods) and 12 covariance estimators
+#' (unadjusted and 11 bias-adjusted estimators).
+#'
+#' Details of \code{beta.method} are as follows:
+#' \itemize{
+#' \item "GEE" is the conventional GEE method (Liang and Zeger, 1986)
+#' \item "BCGEE" is the bias-corrected GEE method
+#'       (Paul and Zhang, 2014; Lunardon and Scharfstein, 2017)
+#' \item "PGEE" is the bias reduction of the GEE method obtained by adding a
+#'       Firth-type penalty term to the estimating equation
+#'       (Mondol and Rahman, 2019)
+#' }
+#'
+#' Details of \code{SE.method} are as follows:
+#' \itemize{
+#' \item "SA" is the unadjusted sandwich variance estimator
+#'       (Liang and Zeger, 1986)
+#' \item "MK" is the MacKinnon and White estimator (MacKinnon and White, 1985)
+#' \item "KC" is the Kauermann and Carroll estimator
+#'        (Kauermann and Carroll, 2001)
+#' \item "MD" is the Mancl and DeRouen estimator (Mancl and DeRouen, 2001)
+#' \item "FG" is the Fay and Graubard estimator (Fay and Graubard, 2001)
+#' \item "PA" is the Pan estimator (Pan, 2001)
+#' \item "GS" is the Gosho et al. estimator (Gosho et al., 2014)
+#' \item "MB" is the Morel et al. estimator (Morel et al., 2003)
+#' \item "WL" is the Wang and Long estimator (Wang and Long, 2011)
+#' \item "WB" is the Westgate and Burchett estimator
+#'       (Westgate and Burchett, 2016)
+#' \item "FW" is the Ford and Wastgate estimator (Ford and Wastgate, 2017)
+#' \item "FZ" is the Fan et al. estimator (Fan et al., 2013)
+#' }
+#'
+#' Descriptions and performances of some of the above methods can be found in
+#' Gosho et al. (2023).
 #'
 #' @param formula Object of class formula: symbolic description of model to be
 #'        fitted (see documentation of \code{lm} and
 #'        \code{formula} for details).
 #' @param data  Data frame.
-#' @param id  Vector that identifies the subjects or clusters (NULL by default).
+#' @param id  Vector that identifies the subjects or clusters (\code{NULL} by
+#'        default).
 #' @param repeated Vector that identifies repeatedly measured variable within
 #'        each subject or cluster. If \code{repeated = NULL}, as is the case in
 #'        function \code{gee}, data are assumed to be sorted so that
@@ -17,17 +53,18 @@
 #' @param corstr Working correlation structure. The following are permitted:
 #'        "\code{independence}", "\code{exchangeable}", "\code{ar1}", and
 #'        "\code{unstructured}" ("\code{independence}" by default).
-#' @param beta.method Method for estimating regression parameters.
-#'        The following are permitted: "\code{GEE}", "\code{PGEE}", and
-#'        "\code{BCGEE}" ("\code{PGEE}" by default).
-#' @param SE.method Method for estimating standard errors. The following are
-#'        permitted: "\code{SA}", "\code{MK}", "\code{KC}", "\code{MD}",
-#'        "\code{FG}", "\code{PA}", "\code{GS}", "\code{MB}", "\code{WL}",
-#'        "\code{WB}", "\code{FW}", and "\code{FZ}" ("\code{MB}" by default).
+#' @param beta.method Method for estimating regression parameters (see Details
+#'        section). The following are permitted: "\code{GEE}", "\code{PGEE}",
+#'        and "\code{BCGEE}" ("\code{PGEE}" by default).
+#' @param SE.method Method for estimating standard errors (see Details section).
+#'        The following are permitted: "\code{SA}", "\code{MK}", "\code{KC}",
+#'        "\code{MD}", "\code{FG}", "\code{PA}", "\code{GS}", "\code{MB}",
+#'        "\code{WL}", "\code{WB}", "\code{FW}", and "\code{FZ}"
+#'        ("\code{MB}" by default).
 #' @param b Numeric vector specifying initial values of regression coefficients.
-#'        If \code{b = NULL} (i.e., default value), the initial values are
-#'        calculated using the ordinary or Firth logistic regression assuming
-#'        that all the observations are independent.
+#'        If \code{b = NULL} (default value), the initial values are calculated
+#'        using the ordinary or Firth logistic regression assuming that all the
+#'        observations are independent.
 #' @param maxitr Maximum number of iterations (50 by default).
 #' @param tol Tolerance used in fitting algorithm (\code{1e-5} by default).
 #' @param scale.fix Logical variable; if \code{TRUE}, the scale parameter is
@@ -35,21 +72,93 @@
 #' @param conf.level Numeric value of confidence level for confidence intervals
 #'        (0.95 by default).
 #'
-#' @return an object of class "\code{geessbin}" representing the results of
+#' @return The object of class "\code{geessbin}" representing the results of
 #' modified generalized estimating equations with bias-adjusted covariance
 #' estimators. Generic function \code{summary} provides details of the results.
 #'
-#' @references Liang, K. and Zeger, S. (1986). Longitudinal data analysis using
+#' @references \itemize{
+#'   \item Liang, K. and Zeger, S. (1986). Longitudinal data analysis using
 #'         generalized linear models.
-#'         \emph{Biometrika}, 73, 13-22.
+#'         \emph{Biometrika}, 73, 13–22,
+#'         \url{https://doi.org/10.1093/biomet/73.1.13}.\cr
+#'   \item Paul, S. and Zhang, X. (2014). Small sample GEE estimation of
+#'         regression parameters for longitudinal data.
+#'         \emph{Statistics in Medicine}, 33, 3869–3881,
+#'         \url{https://doi.org/10.1002/sim.6198}.\cr
+#'   \item Lunardon, N. and Scharfstein, D. (2017). Comment on ‘Small sample GEE
+#'         estimation of regression parameters for longitudinal data’.
+#'         \emph{Statistics in Medicine}, 36, 3596–3600,
+#'         \url{https://doi.org/10.1002/sim.7366}.\cr
+#'   \item Mondol, M. H. and Rahman, M. S. (2019). Bias-reduced and
+#'         separation-proof GEE with small or sparse longitudinal binary data.
+#'         \emph{Statistics in Medicine}, 38, 2544–2560,
+#'         \url{https://doi.org/10.1002/sim.8126}.\cr
+#'   \item MacKinnon, J. G. and White, H. (1985). Some
+#'         heteroskedasticity-consistent covariance matrix estimators with
+#'         improved finite sample properties.
+#'         \emph{Journal of Econometrics}, 29, 305–325,
+#'         \url{https://doi.org/10.1016/0304-4076(85)90158-7}.\cr
+#'   \item Kauermann, G. and Carroll, R. J. (2001). A note on the efficiency of
+#'         sandwich covariance matrix estimation.
+#'         \emph{Journal of the American Statistical Association},
+#'         96, 1387–1396,
+#'         \url{https://doi.org/10.1198/016214501753382309}.\cr
+#'   \item Mancl, L. A. and DeRouen, T. A. (2001). A covariance estimator for
+#'         GEE with improved small-sample properties.
+#'         \emph{Biometrics}, 57, 126–134,
+#'         \url{https://doi.org/10.1111/j.0006-341X.2001.00126.x}.\cr
+#'   \item Fay, M. P. and Graubard, B. I. (2001). Small-sample adjustments for
+#'         Wald-type tests using sandwich estimators.
+#'         \emph{Biometrics}, 57, 1198–1206,
+#'         \url{https://doi.org/10.1111/j.0006-341X.2001.01198.x}.\cr
+#'   \item Pan, W. (2001). On the robust variance estimator in generalised
+#'         estimating equations.
+#'         \emph{Biometrika}, 88, 901–906,
+#'         \url{https://doi.org/10.1093/biomet/88.3.901}.\cr
+#'   \item Gosho, M., Sato, T., and Takeuchi, H. (2014). Robust covariance
+#'         estimator for small-sample adjustment in the generalized estimating
+#'         equations: A simulation study.
+#'         \emph{Science Journal of Applied Mathematics and Statistics},
+#'         2, 20–25,
+#'         \url{https://doi.org/10.11648/j.sjams.20140201.13}.\cr
+#'   \item Morel, J. G., Bokossa, M. C., and Neerchal, N. K. (2003). Small
+#'         sample correlation for the variance of GEE estimators.
+#'         \emph{Biometrical Journal}, 45, 395–409,
+#'         \url{https://doi.org/10.1002/bimj.200390021}.\cr
+#'   \item Wang, M. and Long, Q. (2011). Modified robust variance estimator for
+#'         generalized estimating equations with improved small-sample
+#'         performance.
+#'         \emph{Statistics in Medicine}, 30, 1278–1291,
+#'         \url{https://doi.org/10.1002/sim.4150}.\cr
+#'   \item Westgate, P. M. and Burchett, W. W. (2016). Improving power in
+#'         small-sample longitudinal studies when using generalized estimating
+#'         equations.
+#'         \emph{Statistics in Medicine}, 35, 3733–3744,
+#'         \url{https://doi.org/10.1002/sim.6967}.\cr
+#'   \item Ford, W. P. and Westgate, P. M. (2017). Improved standard error
+#'         estimator for maintaining the validity of inference in cluster
+#'         randomized trials with a small number of clusters.
+#'         \emph{Biometrical Journal}, 59, 478–495,
+#'         \url{https://doi.org/10.1002/bimj.201600182}.\cr
+#'   \item Fan, C., and Zhang, D., and Zhang, C. H. (2013). A comparison of
+#'         bias-corrected covariance estimators for generalized estimating
+#'         equations.
+#'         \emph{Journal of Biopharmaceutical Statistics}, 23, 1172–1187,
+#'         \url{https://doi.org/10.1080/10543406.2013.813521}.\cr
+#'   \item Gosho, M., Ishii, R., Noma, H., and Maruo, K. (2023).
+#'         A comparison of bias-adjusted generalized estimating equations for
+#'         sparse binary data in small-sample longitudinal studies.
+#'         \emph{Statistics in Medicine},
+#'         \url{https://doi.org/10.1002/sim.9744}.
+#' }
 #'
 #' @examples
 #' data(wheeze)
 #'
 #' # analysis of PGEE method with Morel et al. covariance estimator
-#' res <- geessbin(formula = Wheeze ~ City + Time, id = ID,
-#'                 repeated = Time, corstr = "ar1", data = wheeze,
-#'                 beta.method = "PGEE", SE.method = "MB")
+#' res <- geessbin(formula = Wheeze ~ City + factor(Age), data = wheeze, id = ID,
+#'                 corstr = "ar1", repeated = Age, beta.method = "PGEE",
+#'                 SE.method = "MB")
 #'
 #' # hypothesis tests for regression coefficients
 #' summary(res)
@@ -119,19 +228,15 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
   X <- model.matrix(Terms, dat)
   p <- ncol(X)
 
-  if (length(unique(y)) != 2) stop("outcome vector is not binary")
-
-  if (!is.numeric(y)) stop("outcome vector must be numeric")
-
-  if (!setequal(unique(y), 0:1)) {
-    stop("values of outcome vector must be 0 or 1")
+  if (!is.numeric(y) | !setequal(unique(y), 0:1)) {
+    stop("outcome vector must be numeric and take values in {0, 1}")
   }
 
-  if (length(corstr) > 1) stop("'corstr' has length > 1")
-
-  if (length(beta.method) > 1) stop("'beta.method' has length > 1")
-
-  if (length(SE.method) > 1) stop("'SE.method' has length > 1")
+  for(v in c("corstr", "beta.method", "SE.method")){
+    if (eval(parse(text = paste0("length(", v, ")"))) > 1) {
+      stop(paste0("'", v, "'", " has length > 1"))
+    }
+  }
 
   corstrs <- c("independence", "exchangeable", "ar1", "unstructured")
   if (is.na(match(corstr, corstrs))) {
@@ -167,8 +272,6 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
 
   comp <- unlist(lapply(replst, function(x) identical(x, unique(repseq))))
   if (sum(!comp) > 0) {
-    message("dataset has missing value")
-
     if (!is.na(match(SE.method, c("PA", "GS", "WL", "WB")))) {
       stop(paste0("\"", SE.method, "\"",
                   " method cannot be used for incomplete data"))
@@ -195,40 +298,34 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
         nitr <- nitr + 1
         if (nitr == 50) break
       }
-
-      fitted.p <- 1 / (1 + exp(-X %*% b))
     } else {
       res_glm <- glm(formula = formula, family = "binomial", data = dat)
-      fitted.p <- res_glm$fitted.values
       b <- res_glm$coefficients
-    }
-
-    if(min(fitted.p) < 0.0001 | max(fitted.p) > 0.9999) {
-      stop(paste0("error in calculating initial value: ",
-                  "fitted probabilities numerically 0 or 1 occurred."))
     }
   } else {
     if (anyNA(b) | sum(is.infinite(b)) > 0) stop("'b' contains Na/NaN/Inf")
     names(b) <- colnames(X)
   }
 
-  conv <- 1
+  conv <- "converged"
   nitr <- 0
   del <- 100
   while (del > tol) {
     mu <- 1 / (1 + exp(- X %*% b))
     r <- (y - mu) / sqrt(mu * (1 - mu))
 
-    if(min(mu) < 0.0001 | max(mu) > 0.9999) {
-      stop(paste0("error in iteration = ", nitr, " :",
-                  "fitted probabilities numerically 0 or 1 occurred."))
+    if (min(mu) < 0.0001 | max(mu) > 0.9999) {
+      conv <- "fitted probabilities numerically 0 or 1 occurred."
+      warning(conv)
+      break
     }
 
-    phi <- 1
-    if (scale.fix == F) phi <- sum(r ^ 2) / (sum(ndat) - p)
+    if (scale.fix == TRUE) phi <- 1
+    if (scale.fix == FALSE) phi <- sum(r ^ 2) / (sum(ndat) - p)
     if (is.infinite(phi)) {
-      stop(paste0("error in iteration = ", nitr, " :",
-                  "infinite scale parameter"))
+      conv <- "infinite scale parameter"
+      warning(conv)
+      break
     }
 
     if (corstr == "independence") R <- diag(n)
@@ -300,213 +397,231 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
     if (del > tol) b <- b + Iinv %*% U
 
     nitr <- nitr + 1
-    if (nitr == maxitr) break
+    if (nitr == maxitr) {
+      if (del > tol) conv <- "maximum number of iterations consumed"
+      warning(conv)
+      break
+    }
   }
 
-  if (del > tol) conv <- 0
+  if (conv == "converged" & del > tol) {
+    conv <- "convergence failure"
+    warning(conv)
+  }
 
-  if (beta.method == "BCGEE") {
-    k11 <- array(0, c(p, p))
-    k21 <- k3 <- array(0, c(p, p, p))
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
+  if (conv == "converged") {
+    if (beta.method == "BCGEE") {
+      k11 <- array(0, c(p, p))
+      k21 <- k3 <- array(0, c(p, p, p))
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
 
-      k11 <- k11 + t(mat$VD) %*% mat$emat %*% mat$VD
-      dDi <- array(0, c(ndat[i], p, p))
-      dDVi <- array(0, c(p, ndat[i], p))
+        k11 <- k11 + t(mat$VD) %*% mat$emat %*% mat$VD
+        dDi <- array(0, c(ndat[i], p, p))
+        dDVi <- array(0, c(p, ndat[i], p))
+        for (u in 1:p) {
+          XuPi <- diag(X[idseq == i, u] * c(1 - 2 * mat$mu), ndat[i], ndat[i])
+          dDi[, , u] <- XuPi %*% mat$D
+          dDVi[, , u] <- t(mat$D) %*% XuPi %*% mat$Vinv -
+            0.5 * t(mat$D) %*% (mat$Vinv %*% XuPi + XuPi %*% mat$Vinv)
+        }
+        dDVimat <- matrix(dDVi, c(p, ndat[i] * p))
+
+        for (u in 1:p) {
+          k21[, , u] <- k21[, , u] +
+            dDVimat %*% (diag(p) %x% (mat$emat %*% mat$VD[, u]))
+          k3[, , u] <- k3[, , u] -
+            (dDVimat %*% (diag(p) %x% mat$D[, u]) +
+               dDVi[, , u] %*% mat$D + t(mat$VD) %*% dDi[, , u])
+        }
+      }
+
+      bhat0 <- numeric(p)
       for (u in 1:p) {
-        XuPi <- diag(X[idseq == i, u] * c(1 - 2 * mat$mu), ndat[i], ndat[i])
-        dDi[, , u] <- XuPi %*% mat$D
-        dDVi[, , u] <- t(mat$D) %*% XuPi %*% mat$Vinv -
-          0.5 * t(mat$D) %*% (mat$Vinv %*% XuPi + XuPi %*% mat$Vinv)
-      }
-      dDVimat <- matrix(dDVi, c(p, ndat[i] * p))
-
-      for (u in 1:p) {
-        k21[, , u] <- k21[, , u] +
-          dDVimat %*% (diag(p) %x% (mat$emat %*% mat$VD[, u]))
-        k3[, , u] <- k3[, , u] -
-          (dDVimat %*% (diag(p) %x% mat$D[, u]) +
-             dDVi[, , u] %*% mat$D + t(mat$VD) %*% dDi[, , u])
-      }
-    }
-
-    bhat0 <- numeric(p)
-    for (u in 1:p) {
-      bhat0 <- bhat0 +
-        (k21[, , u] + 0.5 * k3[, , u] %*% Iinv %*% k11) %*% Iinv[, u]
-    }
-
-    b <- b - Iinv %*% bhat0
-
-    I <- matrix(0, p, p)
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-
-      I <- I + t(mat$D) %*% mat$VD
-    }
-
-    Iinv <- ginv(I)
-  }
-
-
-  J <- matrix(0, p, p)
-
-  if (SE.method == "SA" | SE.method == "MK") {
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-
-      J <- J + t(mat$VD) %*% mat$emat %*% mat$VD
-    }
-
-    if (SE.method == "MK") J <- J * K / (K - p)
-  }
-
-  if (SE.method == "KC") {
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-
-      HKC <- sqrtmat(ginv(diag(ndat[i]) - mat$D %*% Iinv %*% t(mat$VD)))
-      J <- J + t(mat$VD) %*% HKC %*% mat$emat %*% t(HKC) %*% mat$VD
-    }
-  }
-
-  if (SE.method == "MD") {
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-
-      HMD <- ginv(diag(ndat[i]) - mat$D %*% Iinv %*% t(mat$VD))
-      J <- J + t(mat$VD) %*% HMD %*% mat$emat %*% t(HMD) %*% mat$VD
-    }
-  }
-
-  if (SE.method == "FG") {
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-
-      Fi <- diag((1 - pmin(0.75, diag(t(mat$VD) %*% mat$D %*% Iinv))) ^ (-0.5),
-                 p, p)
-      J <- J + Fi %*% t(mat$VD) %*% mat$emat %*% mat$VD %*% Fi
-    }
-  }
-
-  if (SE.method == "PA" | SE.method == "GS") {
-    M <- matrix(0, n, n)
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-
-      Aiinv05 <- diag(c(sqrt(1 / mat$nu)), ndat[i], ndat[i])
-      M <- M + Aiinv05 %*% mat$emat %*% Aiinv05
-    }
-
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-      Ai05 <- diag(c(sqrt(mat$nu)), ndat[i], ndat[i])
-
-      J <- J + t(mat$VD) %*% Ai05 %*% M %*% Ai05 %*% mat$VD
-    }
-
-    if (SE.method == "PA") J <- J / K
-    if (SE.method == "GS") J <- J / (K - p)
-  }
-
-  if (SE.method == "MB") {
-    d <- matrix(0, K, p)
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-
-      d[i, ] <- t(mat$VD) %*% mat$e
-    }
-
-    I1 <- (sum(ndat) - 1) * K * cov(d) / (sum(ndat) - p)
-    q <- min(0.5, p / (K - p)) * max(1, sum(diag(Iinv %*% I1)) / p)
-    J <- I1 + q * I
-  }
-
-  if (SE.method == "WL") {
-    M <- matrix(0, n, n)
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-      Aiinv05 <- diag(c(sqrt(1 / mat$nu)), ndat[i], ndat[i])
-
-      HMD <- ginv(diag(ndat[i]) - mat$D %*% Iinv %*% t(mat$VD))
-      M <- M + Aiinv05 %*% HMD %*% mat$emat %*% t(HMD) %*% Aiinv05
-    }
-
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-      Ai05 <- diag(c(sqrt(mat$nu)), ndat[i], ndat[i])
-
-      J <- J + t(mat$VD) %*% Ai05 %*% M %*% Ai05 %*% mat$VD / K
-    }
-  }
-
-  if (SE.method == "WB") {
-    M <- matrix(0, n, n)
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-      Aiinv05 <- diag(c(sqrt(1 / mat$nu)), ndat[i], ndat[i])
-
-      HKC <- sqrtmat(ginv(diag(ndat[i]) - mat$D %*% Iinv %*% t(mat$VD)))
-      M <- M + Aiinv05 %*% HKC %*% mat$emat %*% t(HKC) %*% Aiinv05
-    }
-
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-      Ai05 <- diag(c(sqrt(mat$nu)), ndat[i], ndat[i])
-
-      J <- J + t(mat$VD) %*% Ai05 %*% M %*% Ai05 %*% mat$VD / K
-    }
-  }
-
-  if (SE.method == "FW") {
-    for (i in 1:K) {
-      mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                      R[replst[[i]], replst[[i]]], phi)
-
-      Hi <- mat$D %*% Iinv %*% t(mat$VD)
-      HKC <- sqrtmat(ginv(diag(ndat[i]) - Hi))
-      HMD <- ginv(diag(ndat[i]) - Hi)
-      J <- J + 0.5 * t(mat$VD) %*%
-        (HKC %*% mat$emat %*% t(HKC) + HMD %*% mat$emat %*% t(HMD)) %*% mat$VD
-    }
-  }
-
-  if (SE.method == "FZ") {
-    for (i in 1:K) {
-      mati <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
-                       R[replst[[i]], replst[[i]]], phi)
-
-      HMD <- ginv(diag(ndat[i]) - mati$D %*% Iinv %*% t(mati$VD))
-
-      M <- matrix(0, p, p)
-      for (j in setdiff(1:K, i)) {
-        matj <- calc_mat(X[idseq == j, , drop = FALSE], y[idseq == j], b,
-                         R[replst[[j]], replst[[j]]], phi)
-
-        M <- M + t(matj$VD) %*% matj$emat %*% matj$VD
+        bhat0 <- bhat0 +
+          (k21[, , u] + 0.5 * k3[, , u] %*% Iinv %*% k11) %*% Iinv[, u]
       }
 
-      J <- J + t(mati$VD) %*% HMD %*%
-        (mati$emat - mati$D %*% Iinv %*% M %*% Iinv %*% t(mati$D)) %*%
-        t(HMD) %*% mati$VD
+      b <- b - Iinv %*% bhat0
+
+      I <- matrix(0, p, p)
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+
+        I <- I + t(mat$D) %*% mat$VD
+      }
+
+      Iinv <- ginv(I)
     }
+
+
+    J <- matrix(0, p, p)
+
+    if (SE.method == "SA" | SE.method == "MK") {
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+
+        J <- J + t(mat$VD) %*% mat$emat %*% mat$VD
+      }
+
+      if (SE.method == "MK") J <- J * K / (K - p)
+    }
+
+    if (SE.method == "KC") {
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+
+        HKC <- sqrtmat(ginv(diag(ndat[i]) - mat$D %*% Iinv %*% t(mat$VD)))
+        J <- J + t(mat$VD) %*% HKC %*% mat$emat %*% t(HKC) %*% mat$VD
+      }
+    }
+
+    if (SE.method == "MD") {
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+
+        HMD <- ginv(diag(ndat[i]) - mat$D %*% Iinv %*% t(mat$VD))
+        J <- J + t(mat$VD) %*% HMD %*% mat$emat %*% t(HMD) %*% mat$VD
+      }
+    }
+
+    if (SE.method == "FG") {
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+
+        Fi <- diag(
+          (1 - pmin(0.75, diag(t(mat$VD) %*% mat$D %*% Iinv))) ^ (-0.5), p, p)
+        J <- J + Fi %*% t(mat$VD) %*% mat$emat %*% mat$VD %*% Fi
+      }
+    }
+
+    if (SE.method == "PA" | SE.method == "GS") {
+      M <- matrix(0, n, n)
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+
+        Aiinv05 <- diag(c(sqrt(1 / mat$nu)), ndat[i], ndat[i])
+        M <- M + Aiinv05 %*% mat$emat %*% Aiinv05
+      }
+
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+        Ai05 <- diag(c(sqrt(mat$nu)), ndat[i], ndat[i])
+
+        J <- J + t(mat$VD) %*% Ai05 %*% M %*% Ai05 %*% mat$VD
+      }
+
+      if (SE.method == "PA") J <- J / K
+      if (SE.method == "GS") J <- J / (K - p)
+    }
+
+    if (SE.method == "MB") {
+      d <- matrix(0, K, p)
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+
+        d[i, ] <- t(mat$VD) %*% mat$e
+      }
+
+      I1 <- (sum(ndat) - 1) * K * cov(d) / (sum(ndat) - p)
+      q <- min(0.5, p / (K - p)) * max(1, sum(diag(Iinv %*% I1)) / p)
+      J <- I1 + q * I
+    }
+
+    if (SE.method == "WL") {
+      M <- matrix(0, n, n)
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+        Aiinv05 <- diag(c(sqrt(1 / mat$nu)), ndat[i], ndat[i])
+
+        HMD <- ginv(diag(ndat[i]) - mat$D %*% Iinv %*% t(mat$VD))
+        M <- M + Aiinv05 %*% HMD %*% mat$emat %*% t(HMD) %*% Aiinv05
+      }
+
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+        Ai05 <- diag(c(sqrt(mat$nu)), ndat[i], ndat[i])
+
+        J <- J + t(mat$VD) %*% Ai05 %*% M %*% Ai05 %*% mat$VD / K
+      }
+    }
+
+    if (SE.method == "WB") {
+      M <- matrix(0, n, n)
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+        Aiinv05 <- diag(c(sqrt(1 / mat$nu)), ndat[i], ndat[i])
+
+        HKC <- sqrtmat(ginv(diag(ndat[i]) - mat$D %*% Iinv %*% t(mat$VD)))
+        M <- M + Aiinv05 %*% HKC %*% mat$emat %*% t(HKC) %*% Aiinv05
+      }
+
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+        Ai05 <- diag(c(sqrt(mat$nu)), ndat[i], ndat[i])
+
+        J <- J + t(mat$VD) %*% Ai05 %*% M %*% Ai05 %*% mat$VD / K
+      }
+    }
+
+    if (SE.method == "FW") {
+      for (i in 1:K) {
+        mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                        R[replst[[i]], replst[[i]]], phi)
+
+        Hi <- mat$D %*% Iinv %*% t(mat$VD)
+        HKC <- sqrtmat(ginv(diag(ndat[i]) - Hi))
+        HMD <- ginv(diag(ndat[i]) - Hi)
+        J <- J + 0.5 * t(mat$VD) %*%
+          (HKC %*% mat$emat %*% t(HKC) + HMD %*% mat$emat %*% t(HMD)) %*% mat$VD
+      }
+    }
+
+    if (SE.method == "FZ") {
+      for (i in 1:K) {
+        mati <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
+                         R[replst[[i]], replst[[i]]], phi)
+
+        HMD <- ginv(diag(ndat[i]) - mati$D %*% Iinv %*% t(mati$VD))
+
+        M <- matrix(0, p, p)
+        for (j in setdiff(1:K, i)) {
+          matj <- calc_mat(X[idseq == j, , drop = FALSE], y[idseq == j], b,
+                           R[replst[[j]], replst[[j]]], phi)
+
+          M <- M + t(matj$VD) %*% matj$emat %*% matj$VD
+        }
+
+        J <- J + t(mati$VD) %*% HMD %*%
+          (mati$emat - mati$D %*% Iinv %*% M %*% Iinv %*% t(mati$D)) %*%
+          t(HMD) %*% mati$VD
+      }
+    }
+
+    covb <- Iinv %*% J %*% Iinv
+
+  } else {
+    covb <- matrix(NA, p, p)
   }
 
-  covb <- Iinv %*% J %*% Iinv
+  if (!exists("phi")) phi <- NA
+
+  if (!exists("b")) b <- rep(NA, p)
+
+  if (!exists("R")) R <- matrix(NA, n, n)
 
   b <- as.vector(b)
   names(b) <- colnames(X)
@@ -551,13 +666,10 @@ calc_mat <- function(X, y, b, R, phi) {
 
 #' @export
 print.geessbin <- function(x, digits = 3, ...) {
-  if(is.null(digits)) digits <- options()$digits else options(digits =
-                                                                digits)
+  if(is.null(digits)) digits <- options()$digits else options(digits = digits)
+
   cat("Call:\n")
   dput(x$call)
-
-  if (x$conv == 1) cstat <- "Success"
-  if (x$conv == 0) cstat <- "Failure"
 
   cat("\nCorrelation Structure: ", x$corstr, "\n")
   cat("Estimation Method for Regression Coefficients: ", x$beta.method, "\n")
@@ -576,7 +688,11 @@ print.geessbin <- function(x, digits = 3, ...) {
   cat("\nWorking Correlation:\n")
   print(x$wcorr, digits = digits, ...)
 
-  cat("\nConvergence: ", x$convergence, "(", cstat, ")")
+  if (x$convergence == "converged") {
+    cat("\nConvergence status: ", "Converged")
+  } else {
+    cat("\nConvergence status: ", "Failed (", x$convergence, ")\n")
+  }
 
   invisible(x)
 }

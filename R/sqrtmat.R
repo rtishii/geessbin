@@ -5,6 +5,14 @@
 #'
 #' @param M Square matrix whose square root is to be computed.
 #'
+#' @return The square root of \code{M}
+#'
+#' @references Kauermann, G. and Carroll, R. J. (2001). A note on the efficiency
+#'         of sandwich covariance matrix estimation.
+#'         \emph{Journal of the American Statistical Association},
+#'         96, 1387–1396,
+#'         \url{https://doi.org/10.1198/016214501753382309}.
+#'
 #' @importFrom MASS ginv
 #'
 #' @export

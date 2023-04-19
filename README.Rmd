@@ -18,9 +18,12 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The geessbin function provides results of modified generalized estimating 
-equations with bias-adjusted covariance estimators for longitudinal or clustered
-data with binary outcomes.
+The geessbin function analyzes small-sample clustered or longitudinal data using
+modified generalized estimating equations (GEE) with bias-adjusted covariance
+estimator. This function assumes binary outcome and uses the logit link
+function. This function provides any combination of three GEE methods 
+(conventional and two modified GEE methods) and 12 covariance estimators
+(unadjusted and 11 bias-adjusted estimators).
 
 ## Installation
 
@@ -47,9 +50,11 @@ library(geessbin)
 data(wheeze)
 
 # analysis of PGEE method with Morel et al. covariance estimator
-res <- geessbin(formula = Wheeze ~ City + Time, id = ID,
-                repeated = Time, corstr = "ar1", data = wheeze,
-                beta.method = "PGEE", SE.method = "MB")
+res <- geessbin(formula = Wheeze ~ City + factor(Age), data = wheeze, id = ID,
+                corstr = "ar1", repeated = Age, beta.method = "PGEE",
+                SE.method = "MB")
+
+print(res)
 
 # hypothesis tests for regression coefficients
 summary(res)

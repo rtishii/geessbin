@@ -9,7 +9,17 @@ sqrtmat(M)
 \arguments{
 \item{M}{Square matrix whose square root is to be computed.}
 }
+\value{
+The square root of \code{M}
+}
 \description{
 \code{sqrtmat} is used to calculate the square root of \eqn{E_i - H_{ii}},
 which is an adjustment factor in Kauermann and Carroll-type method.
+}
+\references{
+Kauermann, G. and Carroll, R. J. (2001). A note on the efficiency
+        of sandwich covariance matrix estimation.
+        \emph{Journal of the American Statistical Association},
+        96, 1387–1396,
+        \url{https://doi.org/10.1198/016214501753382309}.
 }
