@@ -77,79 +77,78 @@
 #' estimators. Generic function \code{summary} provides details of the results.
 #'
 #' @references \itemize{
-#'   \item Liang, K. and Zeger, S. (1986). Longitudinal data analysis using
-#'         generalized linear models.
-#'         \emph{Biometrika}, 73, 13–22,
-#'         \url{https://doi.org/10.1093/biomet/73.1.13}.\cr
-#'   \item Paul, S. and Zhang, X. (2014). Small sample GEE estimation of
-#'         regression parameters for longitudinal data.
-#'         \emph{Statistics in Medicine}, 33, 3869–3881,
-#'         \url{https://doi.org/10.1002/sim.6198}.\cr
-#'   \item Lunardon, N. and Scharfstein, D. (2017). Comment on ‘Small sample GEE
-#'         estimation of regression parameters for longitudinal data’.
-#'         \emph{Statistics in Medicine}, 36, 3596–3600,
-#'         \url{https://doi.org/10.1002/sim.7366}.\cr
-#'   \item Mondol, M. H. and Rahman, M. S. (2019). Bias-reduced and
-#'         separation-proof GEE with small or sparse longitudinal binary data.
-#'         \emph{Statistics in Medicine}, 38, 2544–2560,
-#'         \url{https://doi.org/10.1002/sim.8126}.\cr
-#'   \item MacKinnon, J. G. and White, H. (1985). Some
-#'         heteroskedasticity-consistent covariance matrix estimators with
-#'         improved finite sample properties.
-#'         \emph{Journal of Econometrics}, 29, 305–325,
-#'         \url{https://doi.org/10.1016/0304-4076(85)90158-7}.\cr
-#'   \item Kauermann, G. and Carroll, R. J. (2001). A note on the efficiency of
-#'         sandwich covariance matrix estimation.
-#'         \emph{Journal of the American Statistical Association},
-#'         96, 1387–1396,
-#'         \url{https://doi.org/10.1198/016214501753382309}.\cr
-#'   \item Mancl, L. A. and DeRouen, T. A. (2001). A covariance estimator for
-#'         GEE with improved small-sample properties.
-#'         \emph{Biometrics}, 57, 126–134,
-#'         \url{https://doi.org/10.1111/j.0006-341X.2001.00126.x}.\cr
+#'   \item Fan, C., and Zhang, D., and Zhang, C. H. (2013). A comparison of
+#'         bias-corrected covariance estimators for generalized estimating
+#'         equations.
+#'         \emph{Journal of Biopharmaceutical Statistics}, 23, 1172–1187,
+#'         \doi{10.1080/10543406.2013.813521}.\cr
 #'   \item Fay, M. P. and Graubard, B. I. (2001). Small-sample adjustments for
 #'         Wald-type tests using sandwich estimators.
 #'         \emph{Biometrics}, 57, 1198–1206,
-#'         \url{https://doi.org/10.1111/j.0006-341X.2001.01198.x}.\cr
-#'   \item Pan, W. (2001). On the robust variance estimator in generalised
-#'         estimating equations.
-#'         \emph{Biometrika}, 88, 901–906,
-#'         \url{https://doi.org/10.1093/biomet/88.3.901}.\cr
+#'         \doi{10.1111/j.0006-341X.2001.01198.x}.\cr
+#'   \item Ford, W. P. and Westgate, P. M. (2017). Improved standard error
+#'         estimator for maintaining the validity of inference in cluster
+#'         randomized trials with a small number of clusters.
+#'         \emph{Biometrical Journal}, 59, 478–495,
+#'         \doi{10.1002/bimj.201600182}.\cr
+#'   \item Gosho, M., Ishii, R., Noma, H., and Maruo, K. (2023).
+#'         A comparison of bias-adjusted generalized estimating equations for
+#'         sparse binary data in small-sample longitudinal studies.
+#'         \emph{Statistics in Medicine}, \doi{10.1002/sim.9744}.\cr
 #'   \item Gosho, M., Sato, T., and Takeuchi, H. (2014). Robust covariance
 #'         estimator for small-sample adjustment in the generalized estimating
 #'         equations: A simulation study.
 #'         \emph{Science Journal of Applied Mathematics and Statistics},
 #'         2, 20–25,
-#'         \url{https://doi.org/10.11648/j.sjams.20140201.13}.\cr
+#'         \doi{10.11648/j.sjams.20140201.13}.\cr
+#'   \item Kauermann, G. and Carroll, R. J. (2001). A note on the efficiency of
+#'         sandwich covariance matrix estimation.
+#'         \emph{Journal of the American Statistical Association},
+#'         96, 1387–1396,
+#'         \doi{10.1198/016214501753382309}.\cr
+#'   \item Liang, K. and Zeger, S. (1986). Longitudinal data analysis using
+#'         generalized linear models.
+#'         \emph{Biometrika}, 73, 13–22,
+#'         \doi{10.1093/biomet/73.1.13}.\cr
+#'   \item Lunardon, N. and Scharfstein, D. (2017). Comment on ‘Small sample GEE
+#'         estimation of regression parameters for longitudinal data’.
+#'         \emph{Statistics in Medicine}, 36, 3596–3600,
+#'         \doi{10.1002/sim.7366}.\cr
+#'   \item MacKinnon, J. G. and White, H. (1985). Some
+#'         heteroskedasticity-consistent covariance matrix estimators with
+#'         improved finite sample properties.
+#'         \emph{Journal of Econometrics}, 29, 305–325,
+#'         \doi{10.1016/0304-4076(85)90158-7}.\cr
+#'   \item Mancl, L. A. and DeRouen, T. A. (2001). A covariance estimator for
+#'         GEE with improved small-sample properties.
+#'         \emph{Biometrics}, 57, 126–134,
+#'         \doi{10.1111/j.0006-341X.2001.00126.x}.\cr
+#'   \item Mondol, M. H. and Rahman, M. S. (2019). Bias-reduced and
+#'         separation-proof GEE with small or sparse longitudinal binary data.
+#'         \emph{Statistics in Medicine}, 38, 2544–2560,
+#'         \doi{10.1002/sim.8126}.\cr
 #'   \item Morel, J. G., Bokossa, M. C., and Neerchal, N. K. (2003). Small
 #'         sample correlation for the variance of GEE estimators.
 #'         \emph{Biometrical Journal}, 45, 395–409,
-#'         \url{https://doi.org/10.1002/bimj.200390021}.\cr
+#'         \doi{10.1002/bimj.200390021}.\cr
+#'   \item Pan, W. (2001). On the robust variance estimator in generalised
+#'         estimating equations.
+#'         \emph{Biometrika}, 88, 901–906,
+#'         \doi{10.1093/biomet/88.3.901}.\cr
+#'   \item Paul, S. and Zhang, X. (2014). Small sample GEE estimation of
+#'         regression parameters for longitudinal data.
+#'         \emph{Statistics in Medicine}, 33, 3869–3881,
+#'         \doi{10.1002/sim.6198}.\cr
 #'   \item Wang, M. and Long, Q. (2011). Modified robust variance estimator for
 #'         generalized estimating equations with improved small-sample
 #'         performance.
 #'         \emph{Statistics in Medicine}, 30, 1278–1291,
-#'         \url{https://doi.org/10.1002/sim.4150}.\cr
+#'         \doi{10.1002/sim.4150}.\cr
 #'   \item Westgate, P. M. and Burchett, W. W. (2016). Improving power in
 #'         small-sample longitudinal studies when using generalized estimating
 #'         equations.
 #'         \emph{Statistics in Medicine}, 35, 3733–3744,
-#'         \url{https://doi.org/10.1002/sim.6967}.\cr
-#'   \item Ford, W. P. and Westgate, P. M. (2017). Improved standard error
-#'         estimator for maintaining the validity of inference in cluster
-#'         randomized trials with a small number of clusters.
-#'         \emph{Biometrical Journal}, 59, 478–495,
-#'         \url{https://doi.org/10.1002/bimj.201600182}.\cr
-#'   \item Fan, C., and Zhang, D., and Zhang, C. H. (2013). A comparison of
-#'         bias-corrected covariance estimators for generalized estimating
-#'         equations.
-#'         \emph{Journal of Biopharmaceutical Statistics}, 23, 1172–1187,
-#'         \url{https://doi.org/10.1080/10543406.2013.813521}.\cr
-#'   \item Gosho, M., Ishii, R., Noma, H., and Maruo, K. (2023).
-#'         A comparison of bias-adjusted generalized estimating equations for
-#'         sparse binary data in small-sample longitudinal studies.
-#'         \emph{Statistics in Medicine},
-#'         \url{https://doi.org/10.1002/sim.9744}.
+#'         \doi{10.1002/sim.6967}.
 #' }
 #'
 #' @examples

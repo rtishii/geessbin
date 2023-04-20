@@ -21,10 +21,10 @@
 #' @examples data(wheeze)
 #'
 #' @references \itemize{
+#'   \item Fitzmaurice, G.M., Laird, N.M., and Ware, J.H. (2011).
+#'         \emph{Applied Longitudinal Analysis, 2nd edition}. Wiley, New York.
 #'   \item Hardin, J. and Hilbe, J. (2013).
 #'         \emph{Generalized Estimating Equations, 2nd edition}.
 #'         Chapman and Hall, London.
-#'   \item Fitzmaurice, G.M., Laird, N.M., and Ware, J.H. (2011).
-#'         \emph{Applied Longitudinal Analysis, 2nd edition}. Wiley, New York.
 #'   }
 NULL
