@@ -94,7 +94,8 @@
 #'   \item Gosho, M., Ishii, R., Noma, H., and Maruo, K. (2023).
 #'         A comparison of bias-adjusted generalized estimating equations for
 #'         sparse binary data in small-sample longitudinal studies.
-#'         \emph{Statistics in Medicine}, \doi{10.1002/sim.9744}.\cr
+#'         \emph{Statistics in Medicine}, 42, 2711–2727,
+#'          \doi{10.1002/sim.9744}.\cr
 #'   \item Gosho, M., Sato, T., and Takeuchi, H. (2014). Robust covariance
 #'         estimator for small-sample adjustment in the generalized estimating
 #'         equations: A simulation study.
@@ -164,7 +165,7 @@
 #'
 #' @importFrom MASS ginv
 #' @importFrom stats model.matrix model.response model.frame model.extract
-#' @importFrom stats glm cov pnorm qnorm
+#' @importFrom stats glm.fit cov pnorm qnorm binomial
 #'
 #' @export
 geessbin <- function (formula, data = parent.frame(), id = NULL,
@@ -288,7 +289,7 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
       nitr <- 0
       while (del > 1e-5) {
         mu <- 1 / (1 + exp(-X %*% b))
-        I <- t(X) %*% diag(c(mu * (1 - mu))) %*% X
+        I <- t(c(mu * (1 - mu)) * X) %*% X
         U <- t(X) %*%
           (y - mu + diag(X %*% ginv(I) %*% t(X)) * mu * (1 - mu) * (0.5 - mu))
         del <- max(abs(U))
@@ -298,8 +299,7 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
         if (nitr == 50) break
       }
     } else {
-      res_glm <- glm(formula = formula, family = "binomial", data = dat)
-      b <- res_glm$coefficients
+      b <- glm.fit(X, y, family = binomial(link = "logit"))$coefficients
     }
   } else {
     if (anyNA(b) | sum(is.infinite(b)) > 0) stop("'b' contains Na/NaN/Inf")
@@ -333,7 +333,7 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
       a0 <- 0
       for (i in 1:K) {
         ri <- r[idseq == i]
-        pmat <- ri %*% t(ri)
+        pmat <- tcrossprod(ri)
         a0 <- a0 + sum(pmat[upper.tri(pmat)])
       }
       alpha <- a0 / ((0.5 * sum(ndat * (ndat - 1)) - p) * phi)
@@ -360,8 +360,8 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
         ri <- ci <- numeric(n)
         ri[replst[[i]]] <- r[idseq == i]
         ci[replst[[i]]] <- 1
-        m <- m + t(t(ri)) %*% t(ri)
-        count <- count + t(t(ci)) %*% t(ci)
+        m <- m + tcrossprod(ri)
+        count <- count + tcrossprod(ci)
       }
       R <- m / (phi * (count - p))
       diag(R) <- 1
@@ -379,16 +379,14 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
 
       if (beta.method == "PGEE") {
         dI <- dI + array(apply(X[idseq == i, , drop = FALSE], 2, function (x) {
-          t(mat$D) %*% diag(c(1 - 2 * mat$mu) * x, ndat[i], ndat[i]) %*%
-            mat$VD
-        }), c(p, p, p))
+          t((c(1 - 2 * mat$mu) * x) * mat$D) %*% mat$VD}), c(p, p, p))
       }
     }
 
     Iinv <- ginv(I)
 
     if (beta.method == "PGEE") {
-        U <- U + 0.5 * apply(dI, 3, function (x) sum(diag(Iinv %*% x)))
+      U <- U + 0.5 * apply(dI, 3, function (x) sum(diag(Iinv %*% x)))
     }
 
     del <- max(abs(U))
@@ -417,22 +415,19 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
                         R[replst[[i]], replst[[i]]], phi)
 
         k11 <- k11 + t(mat$VD) %*% mat$emat %*% mat$VD
-        dDi <- array(0, c(ndat[i], p, p))
-        dDVi <- array(0, c(p, ndat[i], p))
-        for (u in 1:p) {
-          XuPi <- diag(X[idseq == i, u] * c(1 - 2 * mat$mu), ndat[i], ndat[i])
-          dDi[, , u] <- XuPi %*% mat$D
-          dDVi[, , u] <- t(mat$D) %*% XuPi %*% mat$Vinv -
-            0.5 * t(mat$D) %*% (mat$Vinv %*% XuPi + XuPi %*% mat$Vinv)
-        }
-        dDVimat <- matrix(dDVi, c(p, ndat[i] * p))
+        px <- (1 - 2 * mat$mu) * X[idseq == i, ]
+        dD <- array(matrix(rep(t(px), p), ncol = p, byrow = TRUE) *
+                      rep(mat$D, p), c(ndat[i], p, p))
+        dDV <- array(0.5 * t(mat$D) %*% matrix(
+          (matrix(rep(t(px), ndat[i]), ncol = p, byrow = TRUE) -
+             rep(px, each = ndat[i])) * rep(mat$Vinv, p),
+          nrow = ndat[i]), c(p, ndat[i], p))
 
         for (u in 1:p) {
-          k21[, , u] <- k21[, , u] +
-            dDVimat %*% (diag(p) %x% (mat$emat %*% mat$VD[, u]))
-          k3[, , u] <- k3[, , u] -
-            (dDVimat %*% (diag(p) %x% mat$D[, u]) +
-               dDVi[, , u] %*% mat$D + t(mat$VD) %*% dDi[, , u])
+          k21[, u, ] <- k21[, u, ] + dDV[, , u] %*% mat$emat %*% mat$VD
+          dDV_D <- dDV[, , u] %*% mat$D
+          k3[, u, ] <- k3[, u, ] - dDV_D
+          k3[, , u] <- k3[, , u] - dDV_D - t(mat$VD) %*% dD[, , u]
         }
       }
 
@@ -506,16 +501,15 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
         mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
                         R[replst[[i]], replst[[i]]], phi)
 
-        Aiinv05 <- diag(c(sqrt(1 / mat$nu)), ndat[i], ndat[i])
-        M <- M + Aiinv05 %*% mat$emat %*% Aiinv05
+        M <- M + sqrt(1 / mat$nu) * mat$emat *
+          rep(sqrt(1 / mat$nu), each = ndat[i])
       }
 
       for (i in 1:K) {
         mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
                         R[replst[[i]], replst[[i]]], phi)
-        Ai05 <- diag(c(sqrt(mat$nu)), ndat[i], ndat[i])
 
-        J <- J + t(mat$VD) %*% Ai05 %*% M %*% Ai05 %*% mat$VD
+        J <- J + t(mat$VD) %*% (sqrt(mat$nu) * M) %*% (sqrt(mat$nu) * mat$VD)
       }
 
       if (SE.method == "PA") J <- J / K
@@ -541,18 +535,18 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
       for (i in 1:K) {
         mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
                         R[replst[[i]], replst[[i]]], phi)
-        Aiinv05 <- diag(c(sqrt(1 / mat$nu)), ndat[i], ndat[i])
 
         HMD <- ginv(diag(ndat[i]) - mat$D %*% Iinv %*% t(mat$VD))
-        M <- M + Aiinv05 %*% HMD %*% mat$emat %*% t(HMD) %*% Aiinv05
+        M <- M +
+          (sqrt(1 / mat$nu) * HMD) %*% mat$emat %*% t((sqrt(1 / mat$nu) * HMD))
       }
 
       for (i in 1:K) {
         mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
                         R[replst[[i]], replst[[i]]], phi)
-        Ai05 <- diag(c(sqrt(mat$nu)), ndat[i], ndat[i])
 
-        J <- J + t(mat$VD) %*% Ai05 %*% M %*% Ai05 %*% mat$VD / K
+        J <- J +
+          t(mat$VD) %*% (sqrt(mat$nu) * M) %*% (sqrt(mat$nu) * mat$VD) / K
       }
     }
 
@@ -561,18 +555,18 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
       for (i in 1:K) {
         mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
                         R[replst[[i]], replst[[i]]], phi)
-        Aiinv05 <- diag(c(sqrt(1 / mat$nu)), ndat[i], ndat[i])
 
         HKC <- sqrtmat(ginv(diag(ndat[i]) - mat$D %*% Iinv %*% t(mat$VD)))
-        M <- M + Aiinv05 %*% HKC %*% mat$emat %*% t(HKC) %*% Aiinv05
+        M <- M +
+          (sqrt(1 / mat$nu) * HKC) %*% mat$emat %*% t((sqrt(1 / mat$nu) * HKC))
       }
 
       for (i in 1:K) {
         mat <- calc_mat(X[idseq == i, , drop = FALSE], y[idseq == i], b,
                         R[replst[[i]], replst[[i]]], phi)
-        Ai05 <- diag(c(sqrt(mat$nu)), ndat[i], ndat[i])
 
-        J <- J + t(mat$VD) %*% Ai05 %*% M %*% Ai05 %*% mat$VD / K
+        J <- J +
+          t(mat$VD) %*% (sqrt(mat$nu) * M) %*% (sqrt(mat$nu) * mat$VD) / K
       }
     }
 
@@ -622,6 +616,10 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
 
   if (!exists("R")) R <- matrix(NA, n, n)
 
+  lin <- c(X %*% b)
+  mu <- c(1 / (1 + exp(-lin)))
+  resid <- c(y - mu)
+
   b <- as.vector(b)
   names(b) <- colnames(X)
 
@@ -636,6 +634,9 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
   structure(class = "geessbin",
             list(call = Call,
                  coefficients = b,
+                 linear.predictors = lin,
+                 fitted.values = mu,
+                 residuals = resid,
                  scale = phi,
                  covb = covb,
                  wcorr = R,
@@ -647,20 +648,22 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
                  corstr = corstr,
                  convergence = conv,
                  conf.level = conf.level,
+                 model.matrix = X,
                  data = data))
 }
 
+
+
 calc_mat <- function(X, y, b, R, phi) {
-  mu <- 1 / (1 + exp( - X %*% b))
+  mu <- c(1 / (1 + exp( - X %*% b)))
   nu <- mu * (1 - mu)
   e <- y - mu
-  Ainv05 <- diag(c(sqrt(1 / nu)), nrow(X), nrow(X))
-  D <- diag(c(nu), nrow(X), nrow(X)) %*% X
-  Vinv <- Ainv05 %*% ginv(R) %*% Ainv05 / phi
+  D <- nu * X
+  Vinv <- sqrt(1 / nu) * ginv(R) * rep(sqrt(1 / nu), each = length(y)) / phi
 
   list(mu = mu, nu = nu, D = D,
        Vinv = Vinv, VD = Vinv %*% D,
-       e = e, emat = e %*% t(e))
+       e = e, emat = tcrossprod(e))
 }
 
 #' @export
@@ -688,7 +691,7 @@ print.geessbin <- function(x, digits = 3, ...) {
   print(x$wcorr, digits = digits, ...)
 
   if (x$convergence == "converged") {
-    cat("\nConvergence status: ", "Converged")
+    cat("\nConvergence status: ", "Converged\n")
   } else {
     cat("\nConvergence status: ", "Failed (", x$convergence, ")\n")
   }
@@ -701,7 +704,7 @@ summary.geessbin <- function(object, ...){
   b <- object$coefficients
   se <- sqrt(diag(object$covb))
   coef <- matrix(c(b, se, b/se, pnorm(-abs(b/se), 0, 1) * 2), ncol = 4)
-  colnames(coef) <- c("Estimate", "Std.err", "Z", "P.value")
+  colnames(coef) <- c("Estimate", "Std.err", "Z", "Pr(>|Z|)")
   rownames(coef) <- names(b)
 
   b0 <- b[toupper(names(b)) != "(INTERCEPT)"]
@@ -757,4 +760,36 @@ print.summary.geessbin <- function(x, digits = 3, ...) {
   print(x$wcorr, digits = digits)
 
   invisible(x)
+}
+
+#' @export
+vcov.geessbin <- function (object, ...) {
+  covb <- object$covb
+  rownames(covb) <- colnames(covb) <- names(object$coefficients)
+  return(covb)
+}
+
+#' @export
+coef.geessbin <- function (object, ...) {
+  return(object$coefficients)
+}
+
+#' @export
+coef.summary.geessbin <- function (object, ...) {
+  return(object$coefficients)
+}
+
+#' @export
+residuals.geessbin <- function (object, ...) {
+  return(object$residuals)
+}
+
+#' @export
+model.matrix.geessbin <- function (object, ...) {
+  return(object$model.matrix)
+}
+
+#' @export
+fitted.geessbin <- function (object, ...) {
+  return(object$fitted.values)
 }
