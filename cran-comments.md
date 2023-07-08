@@ -4,4 +4,5 @@
 
 ## Resubmission
 
-In this resubmission, references have been revised.
+In this resubmission (version 0.1.2), 
+revised geessbin function and added generic functions.

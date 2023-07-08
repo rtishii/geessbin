@@ -70,7 +70,7 @@ print(res)
 #> 11 0.1687 0.411 1.000 0.4107
 #> 12 0.0693 0.169 0.411 1.0000
 #> 
-#> Convergence:  1 ( Success )
+#> Convergence status:  Converged
 
 # hypothesis tests for regression coefficients
 summary(res)
@@ -84,14 +84,14 @@ summary(res)
 #> Estimation Method for Standard Errors:  MB 
 #> 
 #> Coefficients:
-#>               Estimate Std.err      Z P.value
-#> (Intercept)     -0.546   0.782 -0.699   0.625
-#> City             0.226   0.827  0.273   0.769
-#> factor(Age)10   -0.237   0.752 -0.315   0.759
-#> factor(Age)11   -0.511   0.870 -0.588   0.671
-#> factor(Age)12   -0.525   0.986 -0.532   0.692
+#>               Estimate Std.err      Z Pr(>|Z|)
+#> (Intercept)     -0.546   0.782 -0.699    0.485
+#> City             0.226   0.827  0.273    0.785
+#> factor(Age)10   -0.237   0.752 -0.315    0.753
+#> factor(Age)11   -0.511   0.870 -0.588    0.557
+#> factor(Age)12   -0.525   0.986 -0.532    0.594
 #> 
-#> Odds Ratios with 95 % Confidence Intervals :
+#> Odds Ratios with 95% Confidence Intervals :
 #>               Odds Ratio Lower Limit Upper Limit
 #> City               1.254      0.2477        6.35
 #> factor(Age)10      0.789      0.1809        3.44

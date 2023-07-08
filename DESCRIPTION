@@ -1,7 +1,7 @@
 Package: geessbin
 Type: Package
 Title: Modified Generalized Estimating Equations for Binary Outcome
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(person("Ryota", "Ishii", email = "r.ishii0808@gmail.com",
                   role = c("aut", "cre")),
                  person("Tomohiro", "Ohigashi", role = "ctb"),

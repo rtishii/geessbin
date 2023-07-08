@@ -141,7 +141,8 @@ summary(res)
   \item Gosho, M., Ishii, R., Noma, H., and Maruo, K. (2023).
         A comparison of bias-adjusted generalized estimating equations for
         sparse binary data in small-sample longitudinal studies.
-        \emph{Statistics in Medicine}, \doi{10.1002/sim.9744}.\cr
+        \emph{Statistics in Medicine}, 42, 2711–2727,
+         \doi{10.1002/sim.9744}.\cr
   \item Gosho, M., Sato, T., and Takeuchi, H. (2014). Robust covariance
         estimator for small-sample adjustment in the generalized estimating
         equations: A simulation study.
