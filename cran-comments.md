@@ -4,5 +4,5 @@
 
 ## Resubmission
 
-In this resubmission (version 0.1.2), 
-revised geessbin function and added generic functions.
+In this resubmission (version 1.0.0), 
+revised geessbin function and added geessbin_all function.

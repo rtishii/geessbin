@@ -10,3 +10,8 @@
 
 * Revised geessbin function
 * Added generic functions
+
+# geessbin 1.0.0
+
+* Revised geessbin function
+* Added geessbin_all function

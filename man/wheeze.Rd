@@ -10,9 +10,10 @@ A data frame with 64 observations on the following 6 variables:
     \item{\code{ID}}{child identifier.}
     \item{\code{Wheeze}}{binary indicator of wheezing presence.}
     \item{\code{City}}{binary indicator of whether the child lives in
-                       Kingston.}
+                       Kingston (0 = Portage; 1 = Kingston).}
     \item{\code{Age}}{age of child in years ranging from 9 to 12.}
-    \item{\code{Smoke}}{measure of smoking habits of child's mother.}
+    \item{\code{Smoke}}{measure of smoking habits (cigarettes per day) of
+                        child's mother.}
   }
 }
 \description{
@@ -26,10 +27,13 @@ data(wheeze)
 }
 \references{
 \itemize{
-  \item Fitzmaurice, G.M., Laird, N.M., and Ware, J.H. (2011).
-        \emph{Applied Longitudinal Analysis, 2nd edition}. Wiley, New York.
   \item Hardin, J. and Hilbe, J. (2013).
         \emph{Generalized Estimating Equations, 2nd edition}.
-        Chapman and Hall, London.
+        Chapman and Hall, London.\cr
+  \item Lipsitz, S. R., Fitzmaurice, G. M., Orav, E. J., and Laird, N. M.
+        (1994). Performance of Generalized Estimating Equations in Practical
+        Situations.
+        \emph{Biometrics}, 50, 270–278,
+        \doi{10.2307/2533218}.
   }
 }

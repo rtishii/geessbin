@@ -103,7 +103,7 @@ Details of \code{SE.method} are as follows:
 \item "WL" is the Wang and Long estimator (Wang and Long, 2011)
 \item "WB" is the Westgate and Burchett estimator
       (Westgate and Burchett, 2016)
-\item "FW" is the Ford and Wastgate estimator (Ford and Wastgate, 2017)
+\item "FW" is the Ford and Wastgate estimator (Ford and Wastgate, 2018)
 \item "FZ" is the Fan et al. estimator (Fan et al., 2013)
 }
 
@@ -124,7 +124,7 @@ summary(res)
 }
 \references{
 \itemize{
-  \item Fan, C., and Zhang, D., and Zhang, C. H. (2013). A comparison of
+  \item Fan, C., Zhang, D., and Zhang, C. H. (2013). A comparison of
         bias-corrected covariance estimators for generalized estimating
         equations.
         \emph{Journal of Biopharmaceutical Statistics}, 23, 1172–1187,
@@ -133,10 +133,10 @@ summary(res)
         Wald-type tests using sandwich estimators.
         \emph{Biometrics}, 57, 1198–1206,
         \doi{10.1111/j.0006-341X.2001.01198.x}.\cr
-  \item Ford, W. P. and Westgate, P. M. (2017). Improved standard error
-        estimator for maintaining the validity of inference in cluster
-        randomized trials with a small number of clusters.
-        \emph{Biometrical Journal}, 59, 478–495,
+  \item Ford, W. P. and Westgate, P. M. (2018). A comparison of
+        bias-corrected empirical covariance estimators with generalized
+        estimating equations in small-sample longitudinal study settings.
+        \emph{Statistics in Medicine}, 37, 4318–4329,
         \doi{10.1002/bimj.201600182}.\cr
   \item Gosho, M., Ishii, R., Noma, H., and Maruo, K. (2023).
         A comparison of bias-adjusted generalized estimating equations for

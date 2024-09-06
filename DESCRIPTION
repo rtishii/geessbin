@@ -1,7 +1,7 @@
 Package: geessbin
 Type: Package
 Title: Modified Generalized Estimating Equations for Binary Outcome
-Version: 0.1.2
+Version: 1.0.0
 Authors@R: c(person("Ryota", "Ishii", email = "r.ishii0808@gmail.com",
                   role = c("aut", "cre")),
                  person("Tomohiro", "Ohigashi", role = "ctb"),
@@ -9,17 +9,17 @@ Authors@R: c(person("Ryota", "Ishii", email = "r.ishii0808@gmail.com",
                  person("Masahiko", "Gosho", role = "ctb"))
 Maintainer: Ryota Ishii <r.ishii0808@gmail.com>
 Description: Analyze small-sample clustered or longitudinal data with binary 
-    outcome using modified generalized estimating equations with bias-adjusted
-    covariance estimator. The package provides any combination of three 
-    modified generalized estimating equations and 11 bias-adjusted covariance 
-    estimators.
+    outcome using modified generalized estimating equations (GEE) with 
+    bias-adjusted covariance estimator. The package provides any combination of 
+    three GEE methods and 12 covariance estimators.
 Depends: R (>= 3.5.0)
-Imports: MASS (>= 7.3-45)
+Imports: 
+    MASS (>= 7.3-45)
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/rtishii/geessbin
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
