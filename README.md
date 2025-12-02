@@ -4,6 +4,7 @@
 # geessbin
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 The geessbin function analyzes small-sample clustered or longitudinal
@@ -60,7 +61,7 @@ print(res)
 #>   (Intercept)          City factor(Age)10 factor(Age)11 factor(Age)12 
 #>        -0.546         0.226        -0.237        -0.511        -0.525 
 #> 
-#> Estimated Scale Parameter:  1.04
+#> Estimated Scale Parameter:  1.036
 #> Number of Iterations:  8 
 #> 
 #> Working Correlation:
@@ -98,7 +99,7 @@ summary(res)
 #> factor(Age)11      0.600      0.1090        3.30
 #> factor(Age)12      0.592      0.0857        4.09
 #> 
-#> Estimated Scale Parameter:  1.04
+#> Estimated Scale Parameter:  1.036
 #> Number of Iterations:  8 
 #> 
 #> Working Correlation:

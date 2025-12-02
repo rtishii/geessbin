@@ -166,6 +166,7 @@
 #' @importFrom MASS ginv
 #' @importFrom stats model.matrix model.response model.frame model.extract
 #' @importFrom stats glm.fit cov pnorm qnorm binomial
+#' @importFrom stats .getXlevels formula delete.response terms na.pass
 #'
 #' @export
 geessbin <- function (formula, data = parent.frame(), id = NULL,
@@ -649,7 +650,8 @@ geessbin <- function (formula, data = parent.frame(), id = NULL,
                  convergence = conv,
                  conf.level = conf.level,
                  model.matrix = X,
-                 data = data))
+                 data = data,
+                 xlevels = .getXlevels(Terms, dat)))
 }
 
 
@@ -668,7 +670,7 @@ calc_mat <- function(X, y, b, R, phi) {
 
 #' @export
 print.geessbin <- function(x, digits = 3, ...) {
-  if(is.null(digits)) digits <- options()$digits else options(digits = digits)
+  if(is.null(digits)) digits <- options()$digits
 
   cat("Call:\n")
   dput(x$call)
@@ -737,8 +739,8 @@ summary.geessbin <- function(object, ...){
 
 #' @export
 print.summary.geessbin <- function(x, digits = 3, ...) {
-  if(is.null(digits)) digits <- options()$digits else options(digits =
-                                                                digits)
+  if(is.null(digits)) digits <- options()$digits
+
   cat("Call:\n")
   dput(x$call)
 
@@ -792,4 +794,53 @@ model.matrix.geessbin <- function (object, ...) {
 #' @export
 fitted.geessbin <- function (object, ...) {
   return(object$fitted.values)
+}
+
+#' @export
+predict.geessbin <- function(object, newdata = NULL,
+                             type = c("response", "link"),
+                             se.fit = FALSE, ...) {
+
+  if (!inherits(object, "geessbin")) {
+    stop("'object' must be an object of class 'geessbin'")
+  }
+
+  type <- match.arg(type)
+  f <- formula(object)
+  Terms <- delete.response(terms(f))
+  environment(Terms) <- environment(f)
+  family <- binomial()
+
+  if (is.null(newdata)) {
+    if (is.null(object$call$data)) {
+      stop("No original data were stored; 'newdata' must be provided.")
+    }
+    df <- eval(object$call$data, envir = environment(f))
+    dat <- model.frame(Terms, df, na.action = na.pass)
+  } else {
+    dat <- model.frame(Terms, newdata, na.action = na.pass,
+                       xlev = object$xlevels)
+  }
+
+  X <- model.matrix(Terms, dat)
+  lin <- drop(X %*% object$coefficients)
+
+  if (type == "response") {
+    fit <- family$linkinv(lin)
+  } else {
+    fit <- lin
+  }
+
+  if (!se.fit) {
+    return(as.vector(fit))
+  }
+
+  if (se.fit) {
+    vc <- object$covb
+    se <- sqrt(rowSums((X %*% vc) * X))
+
+    if (type == "response") se <- family$mu.eta(lin) * se
+
+    return(list(fit = as.vector(fit), se.fit = as.vector(se)))
+  }
 }

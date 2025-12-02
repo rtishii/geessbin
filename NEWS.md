@@ -15,3 +15,8 @@
 
 * Revised geessbin function
 * Added geessbin_all function
+
+# geessbin 1.0.1
+
+* Revised geessbin function
+* Added predict.geessbin function
