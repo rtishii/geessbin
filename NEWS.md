@@ -20,3 +20,6 @@
 
 * Revised geessbin function
 * Added predict.geessbin function
+
+# geessbin 1.0.2
+* Revised sqrtmat function

@@ -21,5 +21,6 @@ sqrtmat <- function(M){
   v <- eig$values
   if (!is.complex(v)) v <- complex(real = v, imaginary = 0)
 
-  return(Re(eig$vectors %*% diag(sqrt(v)) %*% ginv(eig$vectors)))
+  return(Re(eig$vectors %*% diag(sqrt(v),
+                                 ncol = length(v)) %*% ginv(eig$vectors)))
 }

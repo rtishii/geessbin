@@ -4,5 +4,4 @@
 
 ## Resubmission
 
-In this resubmission (version 1.0.1), 
-revised geessbin function and added predict.geessbin function.
+In this resubmission (version 1.0.2), the sqrtmat function was revised.
